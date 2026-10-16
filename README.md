@@ -2,7 +2,9 @@
 
 A production-grade fraud detection system built on **Azure Event Hubs**, **Databricks**, **XGBoost**, **MLflow**, and **Delta Lake** — achieving **F1: 0.913** and **ROC-AUC: 0.999** on held-out test data.
 
-![Dashboard](docs/images/dashboard.png)
+![Overview](docs/images/overview.png)
+![Alerts](docs/images/alerts.png)
+![Model Performance](docs/images/model-performance.png)
 
 ---
 
