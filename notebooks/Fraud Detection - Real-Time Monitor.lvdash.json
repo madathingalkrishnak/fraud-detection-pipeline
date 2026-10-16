@@ -1,0 +1,1047 @@
+{
+  "datasets": [
+    {
+      "name": "1988f3b3",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "SELECT\n",
+        "  COUNT(*)                                          AS total_transactions,\n",
+        "  SUM(is_fraud)                                     AS actual_fraud,\n",
+        "  SUM(predicted_fraud)                              AS predicted_fraud,\n",
+        "  ROUND(SUM(is_fraud) / COUNT(*) * 100, 2)          AS actual_fraud_rate_pct,\n",
+        "  ROUND(SUM(predicted_fraud) / COUNT(*) * 100, 2)   AS predicted_fraud_rate_pct,\n",
+        "  ROUND(SUM(CASE WHEN predicted_fraud=1 AND is_fraud=1 THEN 1 END) / \n",
+        "        NULLIF(SUM(is_fraud), 0) * 100, 2)          AS recall_pct,\n",
+        "  ROUND(SUM(CASE WHEN predicted_fraud=1 AND is_fraud=1 THEN 1 END) / \n",
+        "        NULLIF(SUM(predicted_fraud), 0) * 100, 2)   AS precision_pct,\n",
+        "  ROUND(SUM(CASE WHEN is_fraud=1 THEN amount ELSE 0 END), 2) AS fraud_amount_total\n",
+        "FROM fraud_detection.transactions.scored_transactions"
+      ]
+    },
+    {
+      "name": "ffe42e28",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "SELECT\n",
+        "  hour_of_day,\n",
+        "  COUNT(*)        AS total_txns,\n",
+        "  SUM(is_fraud)   AS fraud_count,\n",
+        "  ROUND(SUM(is_fraud) / COUNT(*) * 100, 2) AS fraud_rate_pct\n",
+        "FROM fraud_detection.transactions.scored_transactions\n",
+        "GROUP BY hour_of_day\n",
+        "ORDER BY hour_of_day"
+      ]
+    },
+    {
+      "name": "3aa8d0f9",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "SELECT\n",
+        "  merchant_category,\n",
+        "  COUNT(*)        AS total_txns,\n",
+        "  SUM(is_fraud)   AS fraud_count,\n",
+        "  ROUND(AVG(fraud_score) * 100, 2) AS avg_fraud_score,\n",
+        "  ROUND(SUM(is_fraud) / COUNT(*) * 100, 2) AS fraud_rate_pct\n",
+        "FROM fraud_detection.transactions.scored_transactions\n",
+        "GROUP BY merchant_category\n",
+        "ORDER BY fraud_rate_pct DESC"
+      ]
+    },
+    {
+      "name": "57748c75",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "SELECT\n",
+        "  transaction_id,\n",
+        "  card_id,\n",
+        "  amount,\n",
+        "  merchant_category,\n",
+        "  entry_mode,\n",
+        "  country,\n",
+        "  ROUND(fraud_score * 100, 1) AS fraud_score_pct,\n",
+        "  alert_level,\n",
+        "  timestamp\n",
+        "FROM fraud_detection.transactions.fraud_alerts\n",
+        "ORDER BY fraud_score DESC\n",
+        "LIMIT 50"
+      ]
+    },
+    {
+      "name": "3f3178b7",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "-- Confusion Matrix (great for showing model quality)\n",
+        "SELECT\n",
+        "    CASE\n",
+        "        WHEN is_fraud = 1 AND predicted_fraud = 1 THEN 'True Positive'\n",
+        "        WHEN is_fraud = 0 AND predicted_fraud = 1 THEN 'False Positive'\n",
+        "        WHEN is_fraud = 1 AND predicted_fraud = 0 THEN 'False Negative'\n",
+        "        WHEN is_fraud = 0 AND predicted_fraud = 0 THEN 'True Negative'\n",
+        "    END AS classification,\n",
+        "    COUNT(*) AS count\n",
+        "FROM fraud_detection.transactions.scored_transactions\n",
+        "GROUP BY 1\n",
+        "ORDER BY 1"
+      ]
+    },
+    {
+      "name": "dd384091",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "-- Confusion Matrix (great for showing model quality)\n",
+        "SELECT\n",
+        "    CASE\n",
+        "        WHEN is_fraud = 1 AND predicted_fraud = 1 THEN 'True Positive'\n",
+        "        WHEN is_fraud = 0 AND predicted_fraud = 1 THEN 'False Positive'\n",
+        "        WHEN is_fraud = 1 AND predicted_fraud = 0 THEN 'False Negative'\n",
+        "        WHEN is_fraud = 0 AND predicted_fraud = 0 THEN 'True Negative'\n",
+        "    END AS classification,\n",
+        "    COUNT(*) AS count\n",
+        "FROM fraud_detection.transactions.scored_transactions\n",
+        "GROUP BY 1\n",
+        "ORDER BY 1"
+      ]
+    },
+    {
+      "name": "8950777f",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "-- Confusion Matrix (great for showing model quality)\n",
+        "SELECT\n",
+        "    CASE\n",
+        "        WHEN is_fraud = 1 AND predicted_fraud = 1 THEN 'True Positive'\n",
+        "        WHEN is_fraud = 0 AND predicted_fraud = 1 THEN 'False Positive'\n",
+        "        WHEN is_fraud = 1 AND predicted_fraud = 0 THEN 'False Negative'\n",
+        "        WHEN is_fraud = 0 AND predicted_fraud = 0 THEN 'True Negative'\n",
+        "    END AS classification,\n",
+        "    COUNT(*) AS count\n",
+        "FROM fraud_detection.transactions.scored_transactions\n",
+        "GROUP BY 1\n",
+        "ORDER BY 1"
+      ]
+    },
+    {
+      "name": "87093444",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "-- Confusion Matrix (great for showing model quality)\n",
+        "SELECT\n",
+        "    CASE\n",
+        "        WHEN is_fraud = 1 AND predicted_fraud = 1 THEN 'True Positive'\n",
+        "        WHEN is_fraud = 0 AND predicted_fraud = 1 THEN 'False Positive'\n",
+        "        WHEN is_fraud = 1 AND predicted_fraud = 0 THEN 'False Negative'\n",
+        "        WHEN is_fraud = 0 AND predicted_fraud = 0 THEN 'True Negative'\n",
+        "    END AS classification,\n",
+        "    COUNT(*) AS count\n",
+        "FROM fraud_detection.transactions.scored_transactions\n",
+        "GROUP BY 1\n",
+        "ORDER BY 1"
+      ]
+    },
+    {
+      "name": "b0793bf4",
+      "displayName": "Untitled dataset",
+      "queryLines": [
+        "USE CATALOG `fraud_detection`;\n",
+        "USE SCHEMA `transactions`;\n",
+        "\n",
+        "-- Top flagged cards (card-level risk profile)\n",
+        "SELECT\n",
+        "    card_id,\n",
+        "    COUNT(*) AS total_txns,\n",
+        "    SUM(predicted_fraud) AS fraud_flags,\n",
+        "    ROUND(AVG(fraud_score), 3) AS avg_risk_score,\n",
+        "    ROUND(SUM(amount), 2) AS total_spend,\n",
+        "    COUNT(DISTINCT country) AS unique_countries\n",
+        "FROM fraud_detection.transactions.scored_transactions\n",
+        "GROUP BY card_id\n",
+        "HAVING fraud_flags > 0\n",
+        "ORDER BY fraud_flags DESC, avg_risk_score DESC\n",
+        "LIMIT 20"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "cbcafd2c",
+      "displayName": "Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "d1d29b07",
+            "queries": [
+              {
+                "name": "21e792657f8345fab2fd3b46a8c8193e",
+                "query": {
+                  "datasetName": "1988f3b3",
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "KPI - Total transactions",
+                "viz_type": "COUNTER",
+                "serialized_options": "{\"stringThouSep\":\",\",\"counterLabel\":\"Total Transactions\",\"rowNumber\":1,\"stringDecChar\":\".\",\"tooltipFormat\":\"0,0.000\",\"counterColName\":\"total_transactions\",\"stringDecimal\":0,\"targetRowNumber\":1,\"targetColName\":\"\"}",
+                "query_name": "21e792657f8345fab2fd3b46a8c8193e"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "b5f50362",
+            "queries": [
+              {
+                "name": "21e792657f8345fab2fd3b46a8c8193e",
+                "query": {
+                  "datasetName": "1988f3b3",
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "KPI - Actual Fraud",
+                "viz_type": "COUNTER",
+                "serialized_options": "{\"stringThouSep\":\",\",\"counterLabel\":\"Actual Fraud\",\"rowNumber\":1,\"stringDecChar\":\".\",\"tooltipFormat\":\"0,0.000\",\"counterColName\":\"actual_fraud\",\"stringDecimal\":0,\"targetRowNumber\":1}",
+                "query_name": "21e792657f8345fab2fd3b46a8c8193e"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "c38afccd",
+            "queries": [
+              {
+                "name": "21e792657f8345fab2fd3b46a8c8193e",
+                "query": {
+                  "datasetName": "1988f3b3",
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "KPI - Recall %",
+                "viz_type": "COUNTER",
+                "serialized_options": "{\"stringThouSep\":\",\",\"counterLabel\":\"Recall Percentage\",\"rowNumber\":1,\"stringDecChar\":\".\",\"tooltipFormat\":\"0,0.000\",\"counterColName\":\"recall_pct\",\"stringDecimal\":1,\"targetRowNumber\":1,\"stringSuffix\":\"%\"}",
+                "query_name": "21e792657f8345fab2fd3b46a8c8193e"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "7069eca0",
+            "queries": [
+              {
+                "name": "21e792657f8345fab2fd3b46a8c8193e",
+                "query": {
+                  "datasetName": "1988f3b3",
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 0,
+              "viz_spec": {
+                "display_name": "KPI - Precision %",
+                "viz_type": "COUNTER",
+                "serialized_options": "{\"stringThouSep\":\",\",\"counterLabel\":\"Precision Percentage\",\"rowNumber\":1,\"stringDecChar\":\".\",\"tooltipFormat\":\"0,0.000\",\"counterColName\":\"precision_pct\",\"stringDecimal\":1,\"targetRowNumber\":1,\"stringSuffix\":\"%\"}",
+                "query_name": "21e792657f8345fab2fd3b46a8c8193e"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "cf6d40f2",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ffe42e28",
+                  "fields": [
+                    {
+                      "name": "hour_of_day",
+                      "expression": "`hour_of_day`"
+                    },
+                    {
+                      "name": "fraud_rate_pct",
+                      "expression": "`fraud_rate_pct`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Fraud Rate by Hour of Day (%)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "mark": {
+                "marker": {
+                  "shape": "circle"
+                },
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  }
+                ],
+                "layout": "layer"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "hour_of_day",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "fraud_rate_pct",
+                  "displayName": "Fraud Rate %",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "3727a85e",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3aa8d0f9",
+                  "fields": [
+                    {
+                      "name": "merchant_category",
+                      "expression": "`merchant_category`"
+                    },
+                    {
+                      "name": "sum(fraud_count)",
+                      "expression": "SUM(`fraud_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Fraud Count by Merchant Category",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "mark": {
+                "colors": [
+                  "#D64839"
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "merchant_category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(fraud_count)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 6,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "a5737421",
+      "displayName": "Alerts",
+      "layout": [
+        {
+          "widget": {
+            "name": "7c3aded2",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "57748c75",
+                  "fields": [
+                    {
+                      "name": "transaction_id",
+                      "expression": "`transaction_id`"
+                    },
+                    {
+                      "name": "card_id",
+                      "expression": "`card_id`"
+                    },
+                    {
+                      "name": "amount",
+                      "expression": "`amount`"
+                    },
+                    {
+                      "name": "merchant_category",
+                      "expression": "`merchant_category`"
+                    },
+                    {
+                      "name": "entry_mode",
+                      "expression": "`entry_mode`"
+                    },
+                    {
+                      "name": "country",
+                      "expression": "`country`"
+                    },
+                    {
+                      "name": "fraud_score_pct",
+                      "expression": "`fraud_score_pct`"
+                    },
+                    {
+                      "name": "alert_level",
+                      "expression": "`alert_level`"
+                    },
+                    {
+                      "name": "timestamp",
+                      "expression": "`timestamp`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "transaction_id",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "card_id",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "amount",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0.00"
+                    }
+                  },
+                  {
+                    "fieldName": "merchant_category",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "entry_mode",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "country",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "fraud_score_pct",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0.00"
+                    }
+                  },
+                  {
+                    "fieldName": "alert_level",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "timestamp",
+                    "useForSearch": false,
+                    "contentAlignment": "right",
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "format": {
+                      "type": "moment.js",
+                      "format": "DD/MM/YYYY HH:mm:ss.SSS"
+                    }
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "High Priority Fraud Alerts",
+                  "fields": []
+                }
+              },
+              "rowsPerPage": 25,
+              "displayRowNumbers": false
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "675a95bb",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "b0793bf4",
+                  "fields": [
+                    {
+                      "name": "card_id",
+                      "expression": "`card_id`"
+                    },
+                    {
+                      "name": "total_txns",
+                      "expression": "`total_txns`"
+                    },
+                    {
+                      "name": "fraud_flags",
+                      "expression": "`fraud_flags`"
+                    },
+                    {
+                      "name": "avg_risk_score",
+                      "expression": "`avg_risk_score`"
+                    },
+                    {
+                      "name": "total_spend",
+                      "expression": "`total_spend`"
+                    },
+                    {
+                      "name": "unique_countries",
+                      "expression": "`unique_countries`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "card_id",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "total_txns",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0"
+                    }
+                  },
+                  {
+                    "fieldName": "fraud_flags",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0"
+                    }
+                  },
+                  {
+                    "fieldName": "avg_risk_score",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0.00"
+                    }
+                  },
+                  {
+                    "fieldName": "total_spend",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0.00"
+                    }
+                  },
+                  {
+                    "fieldName": "unique_countries",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0"
+                    }
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Card-level Risk Profile",
+                  "fields": []
+                }
+              },
+              "rowsPerPage": 25,
+              "displayRowNumbers": false
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 12,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "603d0088",
+      "displayName": "Model Performance",
+      "layout": [
+        {
+          "widget": {
+            "name": "ca111ec4",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3f3178b7",
+                  "fields": [
+                    {
+                      "name": "count",
+                      "expression": "`count`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`classification` IN ('True Positive')"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "True Positives",
+                  "fields": []
+                },
+                "description": {
+                  "value": "True Positives ✅",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    }
+                  },
+                  "rowNumber": 1
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "e4fdedc9",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dd384091",
+                  "fields": [
+                    {
+                      "name": "count",
+                      "expression": "`count`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`classification` IN ('False Positive')"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "False Positives",
+                  "fields": []
+                },
+                "description": {
+                  "value": "False Positives ⚠️",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    }
+                  },
+                  "rowNumber": 1
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "c62e4dce",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "8950777f",
+                  "fields": [
+                    {
+                      "name": "count",
+                      "expression": "`count`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`classification` IN ('False Negative')"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "False Negative",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Missed Fraud ❌",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    }
+                  },
+                  "rowNumber": 1
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "a44b44fa",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "87093444",
+                  "fields": [
+                    {
+                      "name": "count",
+                      "expression": "`count`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`classification` IN ('True Negative')"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "True Negatives",
+                  "fields": []
+                },
+                "description": {
+                  "value": "True Negatives ✅",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    }
+                  },
+                  "rowNumber": 1
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
