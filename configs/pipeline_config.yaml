@@ -1,0 +1,97 @@
+# ============================================================
+# Fraud Detection Pipeline Configuration
+# ============================================================
+
+pipeline:
+  name: "fraud-detection-pipeline"
+  version: "1.0.0"
+  environment: "development"  # development | staging | production
+
+# --- Data Source ---
+data:
+  raw_path: "data/raw/"
+  processed_path: "data/processed/"
+  # For Azure deployment, use ADLS paths:
+  # raw_path: "abfss://raw@<storage_account>.dfs.core.windows.net/transactions/"
+  # processed_path: "abfss://processed@<storage_account>.dfs.core.windows.net/transactions/"
+
+# --- Event Hubs ---
+event_hubs:
+  namespace: "${EVENTHUB_NAMESPACE}"
+  name: "transactions"
+  consumer_group: "$Default"
+  connection_string: "${EVENTHUB_CONNECTION_STRING}"
+  max_events_per_trigger: 1000
+  starting_position: "latest"  # latest | earliest | <specific_offset>
+
+# --- Spark Streaming ---
+streaming:
+  trigger_interval: "10 seconds"
+  checkpoint_location: "data/checkpoints/fraud_pipeline"
+  watermark_delay: "30 seconds"
+  output_mode: "append"
+
+# --- Feature Engineering ---
+features:
+  # Time windows for aggregation features
+  windows:
+    - 1     # 1-minute rolling window
+    - 5     # 5-minute rolling window
+    - 60    # 1-hour rolling window
+    - 1440  # 24-hour rolling window
+
+  # Features to compute per card/user
+  aggregations:
+    - count          # transaction count
+    - sum_amount     # total spend
+    - avg_amount     # average transaction
+    - std_amount     # spending volatility
+    - max_amount     # largest transaction
+    - unique_merchants  # merchant diversity
+
+  # Velocity features
+  velocity:
+    - time_since_last_txn
+    - distance_from_last_txn
+    - amount_change_ratio
+
+# --- Model ---
+model:
+  algorithm: "xgboost"
+  experiment_name: "fraud_detection_experiment"
+  registered_model_name: "fraud_detection_model"
+  hyperparameters:
+    n_estimators: 500
+    max_depth: 8
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    scale_pos_weight: 29  # ~1:29 ratio of fraud to legit
+    eval_metric: "aucpr"
+    early_stopping_rounds: 50
+  threshold: 0.5  # Classification threshold (tune based on precision/recall tradeoff)
+
+# --- Monitoring ---
+monitoring:
+  model_drift:
+    reference_window_days: 30
+    psi_threshold: 0.2        # Population Stability Index alert threshold
+    feature_drift_method: "ks_test"
+    check_interval_hours: 6
+  alerts:
+    fraud_rate_spike_threshold: 0.10  # Alert if fraud rate > 10%
+    latency_threshold_ms: 500         # Alert if inference > 500ms
+    email_recipients:
+      - "your-email@example.com"
+
+# --- Dashboard ---
+dashboard:
+  refresh_interval_seconds: 30
+  metrics:
+    - total_transactions
+    - fraud_count
+    - fraud_rate
+    - avg_fraud_amount
+    - model_precision
+    - model_recall
+    - p99_latency_ms
